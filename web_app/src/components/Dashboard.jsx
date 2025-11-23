@@ -12,7 +12,7 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch('/data/usmle_questions.json')
+        fetch('./data/usmle_questions.json')
             .then(res => res.json())
             .then(data => {
                 // Get test history from localStorage

@@ -43,7 +43,7 @@ function App() {
   }
 
   return (
-    <Router>
+    <Router basename="/usmle">
       <div className="App">
         <Routes>
           <Route path="/" element={<Dashboard />} />

@@ -21,7 +21,7 @@ const CreateTest = () => {
     const [expandedSystems, setExpandedSystems] = useState({});
 
     useEffect(() => {
-        fetch('/data/usmle_questions.json')
+        fetch('./data/usmle_questions.json')
             .then(res => res.json())
             .then(data => {
                 setQuestions(data);
