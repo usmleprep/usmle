@@ -11,7 +11,7 @@ const Dashboard = () => {
     });
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
+    const loadStats = () => {
         fetch('./data/usmle_questions.json')
             .then(res => res.json())
             .then(data => {
@@ -42,7 +42,41 @@ const Dashboard = () => {
                 console.error("Failed to load questions:", err);
                 setLoading(false);
             });
+    };
+
+    useEffect(() => {
+        loadStats();
     }, []);
+
+    const handleResetProgress = () => {
+        const confirmed = window.confirm(
+            '⚠️ WARNING: This will permanently delete ALL your progress!\n\n' +
+            'This includes:\n' +
+            '• All test history\n' +
+            '• All question performance data\n' +
+            '• All flagged questions\n\n' +
+            'This action CANNOT be undone.\n\n' +
+            'Are you sure you want to continue?'
+        );
+
+        if (confirmed) {
+            const doubleConfirm = window.confirm(
+                'Are you ABSOLUTELY sure?\n\n' +
+                'This is your last chance to cancel before all data is deleted.'
+            );
+
+            if (doubleConfirm) {
+                // Clear all localStorage data
+                localStorage.removeItem('testHistory');
+                localStorage.removeItem('questionPerformance');
+
+                // Reload stats
+                loadStats();
+
+                alert('✓ All progress has been reset successfully.');
+            }
+        }
+    };
 
     if (loading) {
         return <div className="flex-center" style={{ height: '100vh' }}>Loading...</div>;
@@ -72,7 +106,7 @@ const Dashboard = () => {
                 />
             </div>
 
-            <div className="flex-center" style={{ gap: '1rem' }}>
+            <div className="flex-center" style={{ gap: '1rem', marginBottom: '2rem' }}>
                 <button
                     onClick={() => navigate('/history')}
                     style={{
@@ -115,6 +149,33 @@ const Dashboard = () => {
                     onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                 >
                     + Create New Test
+                </button>
+            </div>
+
+            <div className="flex-center" style={{ marginTop: '1rem' }}>
+                <button
+                    onClick={handleResetProgress}
+                    style={{
+                        background: 'white',
+                        color: '#dc2626',
+                        padding: '0.75rem 1.5rem',
+                        borderRadius: '8px',
+                        border: '2px solid #fecaca',
+                        fontSize: '0.95rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                    }}
+                    onMouseOver={(e) => {
+                        e.currentTarget.style.borderColor = '#dc2626';
+                        e.currentTarget.style.backgroundColor = '#fef2f2';
+                    }}
+                    onMouseOut={(e) => {
+                        e.currentTarget.style.borderColor = '#fecaca';
+                        e.currentTarget.style.backgroundColor = 'white';
+                    }}
+                >
+                    🗑️ Reset All Progress
                 </button>
             </div>
         </div>
