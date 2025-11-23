@@ -8,6 +8,8 @@ import TestReview from './components/TestReview';
 import Login from './components/Login';
 import { checkEmailAuthorized } from './utils/supabaseClient';
 
+import AuthGuard from './components/AuthGuard';
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
@@ -72,15 +74,17 @@ function App() {
 
   return (
     <Router basename="/usmle">
-      <div className="App">
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/create-test" element={<CreateTest />} />
-          <Route path="/test" element={<TestInterface />} />
-          <Route path="/history" element={<TestHistory />} />
-          <Route path="/review/:testId" element={<TestReview />} />
-        </Routes>
-      </div>
+      <AuthGuard setIsAuthenticated={setIsAuthenticated}>
+        <div className="App">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/create-test" element={<CreateTest />} />
+            <Route path="/test" element={<TestInterface />} />
+            <Route path="/history" element={<TestHistory />} />
+            <Route path="/review/:testId" element={<TestReview />} />
+          </Routes>
+        </div>
+      </AuthGuard>
     </Router>
   );
 }
