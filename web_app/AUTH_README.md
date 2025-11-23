@@ -1,71 +1,51 @@
-# Sistema de Autenticação por E-mail
+# Sistema de Autenticação via Supabase
 
-Este sistema permite que apenas usuários com e-mails autorizados acessem a aplicação.
+Este sistema utiliza o Supabase para gerenciar o acesso à aplicação. Apenas e-mails cadastrados na tabela `authorized_users` podem acessar o sistema.
 
-## Como Adicionar Novos Usuários
+## Como Gerenciar Usuários
 
-1. Abra o arquivo: `src/config/authorizedEmails.js`
+O gerenciamento de usuários é feito diretamente no painel do Supabase.
 
-2. Adicione o e-mail do novo usuário à lista `authorizedEmails`:
+### Adicionar Novo Usuário
 
-```javascript
-export const authorizedEmails = [
-    'example@email.com',
-    'user@example.com',
-    'novousuario@email.com',  // ← Adicione aqui
-    // Adicione mais e-mails aqui
-];
-```
+1. Acesse o painel do seu projeto no [Supabase](https://supabase.com/dashboard).
+2. Vá para o **Table Editor** e selecione a tabela `authorized_users`.
+3. Clique em **Insert row**.
+4. Preencha os campos:
+   - `email`: O e-mail do usuário (ex: `usuario@exemplo.com`)
+   - `active`: `true` (marcado)
+   - `expires_at`: (Opcional) Data de expiração do acesso. Deixe em branco para acesso permanente.
+5. Clique em **Save**.
 
-3. Faça commit e push das mudanças:
+### Remover/Desativar Usuário
 
-```bash
-git add src/config/authorizedEmails.js
-git commit -m "Add new authorized user"
-git push
-```
+1. No Table Editor, encontre o usuário na tabela `authorized_users`.
+2. Para desativar temporariamente:
+   - Edite a linha e desmarque a opção `active` (`false`).
+3. Para remover permanentemente:
+   - Selecione a linha e clique em **Delete**.
 
-4. Aguarde o deploy automático (2-5 minutos)
+## Configuração do Banco de Dados
 
-## Como Remover Usuários
+A tabela `authorized_users` deve ter a seguinte estrutura:
 
-1. Abra `src/config/authorizedEmails.js`
-2. Remova ou comente o e-mail da lista
-3. Faça commit e push
-
-## Características
-
-- ✅ **Case-insensitive**: `User@Email.com` = `user@email.com`
-- ✅ **Validação de formato**: Verifica se é um e-mail válido
-- ✅ **Sessão persistente**: Usuário permanece logado até fazer logout
-- ✅ **Logout manual**: Botão de logout no dashboard
-- ✅ **Validação na inicialização**: Verifica se o e-mail ainda está autorizado ao carregar o app
+| Coluna | Tipo | Descrição |
+|--------|------|-----------|
+| `id` | uuid | Identificador único (Primary Key) |
+| `email` | text | E-mail do usuário (Unique) |
+| `active` | boolean | Se o usuário está ativo (Default: true) |
+| `created_at` | timestamptz | Data de criação |
+| `expires_at` | timestamptz | Data de expiração (Nullable) |
 
 ## Segurança
 
-⚠️ **Importante**: Esta é uma solução básica de controle de acesso. A lista de e-mails autorizados está no código-fonte e pode ser vista por qualquer pessoa que inspecione o código JavaScript.
+- ✅ **Validação em Tempo Real**: O login verifica diretamente no banco de dados.
+- ✅ **Revogação Imediata**: Se você desativar um usuário no Supabase, ele perderá o acesso no próximo login ou revalidação.
+- ✅ **Logs**: O Supabase mantém logs de acesso ao banco de dados.
 
-Para maior segurança, considere:
-- Implementar autenticação com backend
-- Usar serviços como Firebase Authentication ou Auth0
-- Adicionar autenticação de dois fatores (2FA)
+## Variáveis de Ambiente
 
-## Estrutura de Dados
+Para que o sistema funcione, as seguintes variáveis de ambiente (Secrets) devem estar configuradas no GitHub:
 
-### localStorage
-- `usmle_authenticated`: `'true'` se autenticado
-- `usmle_user_email`: E-mail do usuário logado
-- `usmle_session_time`: Timestamp do login
-
-## Exemplo de Uso
-
-```javascript
-// Verificar se um e-mail está autorizado
-import { isEmailAuthorized } from './config/authorizedEmails';
-
-if (isEmailAuthorized('user@example.com')) {
-    console.log('Acesso permitido');
-} else {
-    console.log('Acesso negado');
-}
-```
+- `VITE_SUPABASE_URL`: A URL do seu projeto Supabase.
+- `VITE_SUPABASE_ANON_KEY`: A chave pública (anon) do seu projeto.

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { isEmailAuthorized } from '../config/authorizedEmails';
+import { checkEmailAuthorized } from '../utils/supabaseClient';
 
 const Login = ({ onLoginSuccess }) => {
     const [email, setEmail] = useState('');
@@ -19,22 +19,29 @@ const Login = ({ onLoginSuccess }) => {
             return;
         }
 
-        // Check if email is authorized
-        if (isEmailAuthorized(email)) {
-            // Save session to localStorage
-            localStorage.setItem('usmle_authenticated', 'true');
-            localStorage.setItem('usmle_user_email', email.toLowerCase().trim());
-            localStorage.setItem('usmle_session_time', new Date().getTime().toString());
+        try {
+            // Check if email is authorized via Supabase
+            const result = await checkEmailAuthorized(email);
 
-            // Notify parent component
-            if (onLoginSuccess) {
-                onLoginSuccess(email);
+            if (result.authorized) {
+                // Save session to localStorage
+                localStorage.setItem('usmle_authenticated', 'true');
+                localStorage.setItem('usmle_user_email', email.toLowerCase().trim());
+                localStorage.setItem('usmle_session_time', new Date().getTime().toString());
+
+                // Notify parent component
+                if (onLoginSuccess) {
+                    onLoginSuccess(email);
+                }
+            } else {
+                setError(result.error || 'Access denied. Your email is not authorized to access this system.');
             }
-        } else {
-            setError('Access denied. Your email is not authorized to access this system.');
+        } catch (err) {
+            console.error('Login error:', err);
+            setError('Connection error. Please try again.');
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
 
     return (

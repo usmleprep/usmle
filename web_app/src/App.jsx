@@ -6,29 +6,44 @@ import TestInterface from './components/TestInterface';
 import TestHistory from './components/TestHistory';
 import TestReview from './components/TestReview';
 import Login from './components/Login';
-import { isEmailAuthorized } from './config/authorizedEmails';
+import { checkEmailAuthorized } from './utils/supabaseClient';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
-    // Check for existing session in localStorage
-    const authenticated = localStorage.getItem('usmle_authenticated') === 'true';
-    const storedEmail = localStorage.getItem('usmle_user_email');
+    const validateSession = async () => {
+      // Check for existing session in localStorage
+      const authenticated = localStorage.getItem('usmle_authenticated') === 'true';
+      const storedEmail = localStorage.getItem('usmle_user_email');
 
-    // Validate that the stored email is still authorized
-    if (authenticated && storedEmail && isEmailAuthorized(storedEmail)) {
-      setIsAuthenticated(true);
-    } else {
-      // Clear invalid session
-      localStorage.removeItem('usmle_authenticated');
-      localStorage.removeItem('usmle_user_email');
-      localStorage.removeItem('usmle_session_time');
-      setIsAuthenticated(false);
-    }
+      if (authenticated && storedEmail) {
+        // Validate that the stored email is still authorized in Supabase
+        try {
+          const result = await checkEmailAuthorized(storedEmail);
 
-    setCheckingAuth(false);
+          if (result.authorized) {
+            setIsAuthenticated(true);
+          } else {
+            // Clear invalid session
+            localStorage.removeItem('usmle_authenticated');
+            localStorage.removeItem('usmle_user_email');
+            localStorage.removeItem('usmle_session_time');
+            setIsAuthenticated(false);
+          }
+        } catch (error) {
+          console.error('Session validation error:', error);
+          setIsAuthenticated(false);
+        }
+      } else {
+        setIsAuthenticated(false);
+      }
+
+      setCheckingAuth(false);
+    };
+
+    validateSession();
   }, []);
 
   const handleLoginSuccess = () => {
