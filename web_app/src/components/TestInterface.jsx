@@ -63,11 +63,6 @@ const TestInterface = () => {
     };
 
     const handleNext = () => {
-        if (!hasAnswered) {
-            alert("Please select an answer before proceeding.");
-            return;
-        }
-
         if (isLastQuestion) {
             handleFinishTest();
         } else {
@@ -143,6 +138,7 @@ const TestInterface = () => {
             ? Math.round((correctCount / answeredQuestions.length) * 100)
             : 0;
 
+        // Only update performance for answered questions
         questions.forEach((q, idx) => {
             if (userAnswers[idx] !== undefined) {
                 const isCorrect = userAnswers[idx] === q.correct_answer;

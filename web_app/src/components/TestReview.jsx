@@ -64,7 +64,7 @@ const TestReview = () => {
                         {test.score}%
                     </div>
                     <div style={{ fontSize: '1.1rem', color: 'var(--text-secondary)' }}>
-                        {test.correctCount} / {test.totalQuestions} correct
+                        {test.correctCount} / {test.answeredCount} answered ({test.totalQuestions} total)
                     </div>
                 </div>
 
@@ -89,6 +89,7 @@ const TestReview = () => {
             <div style={{ display: 'grid', gap: '1rem' }}>
                 {test.questions.map((question, idx) => {
                     const isExpanded = expandedQuestions[idx];
+                    const isAnswered = question.answered;
                     const isCorrect = question.isCorrect;
 
                     return (
@@ -106,11 +107,16 @@ const TestReview = () => {
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                     <span style={{
                                         fontSize: '1.5rem',
-                                        color: isCorrect ? 'var(--success-color)' : '#ef4444'
+                                        color: !isAnswered ? '#94a3b8' : (isCorrect ? 'var(--success-color)' : '#ef4444')
                                     }}>
-                                        {isCorrect ? '✓' : '✗'}
+                                        {!isAnswered ? '○' : (isCorrect ? '✓' : '✗')}
                                     </span>
                                     <span style={{ fontWeight: 600 }}>Question {idx + 1}</span>
+                                    {!isAnswered && (
+                                        <span style={{ fontSize: '0.875rem', color: '#94a3b8', fontStyle: 'italic' }}>
+                                            (Not answered)
+                                        </span>
+                                    )}
                                 </div>
                                 <span>{isExpanded ? '▲' : '▼'}</span>
                             </div>
@@ -129,12 +135,15 @@ const TestReview = () => {
                                             let borderColor = 'var(--border-color)';
                                             let backgroundColor = 'white';
 
-                                            if (isCorrectAnswer) {
-                                                borderColor = 'var(--success-color)';
-                                                backgroundColor = '#f0fdf4';
-                                            } else if (isUserAnswer && !isCorrectAnswer) {
-                                                borderColor = '#ef4444';
-                                                backgroundColor = '#fef2f2';
+                                            // Only show correct/incorrect styling if question was answered
+                                            if (isAnswered) {
+                                                if (isCorrectAnswer) {
+                                                    borderColor = 'var(--success-color)';
+                                                    backgroundColor = '#f0fdf4';
+                                                } else if (isUserAnswer && !isCorrectAnswer) {
+                                                    borderColor = '#ef4444';
+                                                    backgroundColor = '#fef2f2';
+                                                }
                                             }
 
                                             return (
@@ -156,17 +165,23 @@ const TestReview = () => {
                                         })}
                                     </div>
 
-                                    <div style={{ padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-                                        <div style={{ marginBottom: '0.5rem' }}>
-                                            <strong>Your Answer:</strong> {question.userAnswer || 'Not answered'}
-                                            {' | '}
-                                            <strong>Correct Answer:</strong> {question.correct_answer}
+                                    {isAnswered ? (
+                                        <div style={{ padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+                                            <div style={{ marginBottom: '0.5rem' }}>
+                                                <strong>Your Answer:</strong> {question.userAnswer}
+                                                {' | '}
+                                                <strong>Correct Answer:</strong> {question.correct_answer}
+                                            </div>
+                                            <div style={{ marginTop: '1rem' }}>
+                                                <strong>Explanation:</strong>
+                                                <div className="explanation-content" style={{ marginTop: '0.5rem' }} dangerouslySetInnerHTML={{ __html: question.explanation }} />
+                                            </div>
                                         </div>
-                                        <div style={{ marginTop: '1rem' }}>
-                                            <strong>Explanation:</strong>
-                                            <div className="explanation-content" style={{ marginTop: '0.5rem' }} dangerouslySetInnerHTML={{ __html: question.explanation }} />
+                                    ) : (
+                                        <div style={{ padding: '1rem', backgroundColor: '#f1f5f9', borderRadius: '8px', textAlign: 'center', color: '#64748b' }}>
+                                            <em>You did not answer this question. The correct answer and explanation are hidden.</em>
                                         </div>
-                                    </div>
+                                    )}
                                 </>
                             )}
                         </div>
