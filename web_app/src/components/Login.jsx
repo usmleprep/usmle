@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { checkEmailAuthorized } from '../utils/supabaseClient';
-import { saveSession, isValidEmail } from '../utils/auth';
 
 const Login = ({ onLoginSuccess }) => {
-    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -12,34 +10,21 @@ const Login = ({ onLoginSuccess }) => {
         setError('');
         setLoading(true);
 
-        // Validate email format
-        if (!isValidEmail(email)) {
-            setError('Please enter a valid email address');
-            setLoading(false);
-            return;
-        }
+        // Simple password check
+        if (password === 'usmle2025') {
+            // Save session to localStorage
+            localStorage.setItem('usmle_authenticated', 'true');
+            localStorage.setItem('usmle_session_time', new Date().getTime().toString());
 
-        try {
-            // Check if email is authorized
-            const result = await checkEmailAuthorized(email);
-
-            if (result.authorized) {
-                // Save session
-                saveSession(email);
-
-                // Notify parent component
-                if (onLoginSuccess) {
-                    onLoginSuccess(email);
-                }
-            } else {
-                setError(result.error || 'Access denied. Please contact support.');
+            // Notify parent component
+            if (onLoginSuccess) {
+                onLoginSuccess('user');
             }
-        } catch (err) {
-            console.error('Login error:', err);
-            setError('Connection error. Please try again.');
-        } finally {
-            setLoading(false);
+        } else {
+            setError('Incorrect password. Please try again.');
         }
+
+        setLoading(false);
     };
 
     return (
@@ -70,7 +55,7 @@ const Login = ({ onLoginSuccess }) => {
                         USMLE Question Bank
                     </h1>
                     <p style={{ color: '#718096', fontSize: '1rem' }}>
-                        Enter your authorized email to continue
+                        Enter password to continue
                     </p>
                 </div>
 
@@ -84,13 +69,13 @@ const Login = ({ onLoginSuccess }) => {
                             color: '#2d3748',
                             fontSize: '0.95rem'
                         }}>
-                            Email Address
+                            Password
                         </label>
                         <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="your.email@example.com"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Enter password"
                             disabled={loading}
                             required
                             style={{
@@ -130,29 +115,29 @@ const Login = ({ onLoginSuccess }) => {
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        disabled={loading || !email}
+                        disabled={loading || !password}
                         style={{
                             width: '100%',
                             padding: '1rem',
                             borderRadius: '8px',
                             border: 'none',
-                            background: loading || !email ? '#cbd5e0' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            background: loading || !password ? '#cbd5e0' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                             color: 'white',
                             fontSize: '1.05rem',
                             fontWeight: 600,
-                            cursor: loading || !email ? 'not-allowed' : 'pointer',
+                            cursor: loading || !password ? 'not-allowed' : 'pointer',
                             transition: 'transform 0.2s, box-shadow 0.2s',
-                            boxShadow: loading || !email ? 'none' : '0 4px 12px rgba(102, 126, 234, 0.4)'
+                            boxShadow: loading || !password ? 'none' : '0 4px 12px rgba(102, 126, 234, 0.4)'
                         }}
                         onMouseOver={(e) => {
-                            if (!loading && email) {
+                            if (!loading && password) {
                                 e.target.style.transform = 'translateY(-2px)';
                                 e.target.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
                             }
                         }}
                         onMouseOut={(e) => {
                             e.target.style.transform = 'translateY(0)';
-                            e.target.style.boxShadow = loading || !email ? 'none' : '0 4px 12px rgba(102, 126, 234, 0.4)';
+                            e.target.style.boxShadow = loading || !password ? 'none' : '0 4px 12px rgba(102, 126, 234, 0.4)';
                         }}
                     >
                         {loading ? 'Verifying...' : 'Access App'}

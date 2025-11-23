@@ -6,21 +6,19 @@ import TestInterface from './components/TestInterface';
 import TestHistory from './components/TestHistory';
 import TestReview from './components/TestReview';
 import Login from './components/Login';
-import { getSession } from './utils/auth';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
-    // Check for existing session on load
-    const session = getSession();
-    setIsAuthenticated(!!session);
+    // Check for existing session in localStorage
+    const authenticated = localStorage.getItem('usmle_authenticated') === 'true';
+    setIsAuthenticated(authenticated);
     setCheckingAuth(false);
   }, []);
 
-  const handleLoginSuccess = (email) => {
-    console.log('User logged in:', email);
+  const handleLoginSuccess = () => {
     setIsAuthenticated(true);
   };
 
