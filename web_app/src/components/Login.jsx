@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import { isEmailAuthorized } from '../config/authorizedEmails';
 
 const Login = ({ onLoginSuccess }) => {
-    const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -10,18 +11,27 @@ const Login = ({ onLoginSuccess }) => {
         setError('');
         setLoading(true);
 
-        // Simple password check
-        if (password === 'usmle2025') {
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            setError('Please enter a valid email address.');
+            setLoading(false);
+            return;
+        }
+
+        // Check if email is authorized
+        if (isEmailAuthorized(email)) {
             // Save session to localStorage
             localStorage.setItem('usmle_authenticated', 'true');
+            localStorage.setItem('usmle_user_email', email.toLowerCase().trim());
             localStorage.setItem('usmle_session_time', new Date().getTime().toString());
 
             // Notify parent component
             if (onLoginSuccess) {
-                onLoginSuccess('user');
+                onLoginSuccess(email);
             }
         } else {
-            setError('Incorrect password. Please try again.');
+            setError('Access denied. Your email is not authorized to access this system.');
         }
 
         setLoading(false);
@@ -55,7 +65,7 @@ const Login = ({ onLoginSuccess }) => {
                         USMLE Question Bank
                     </h1>
                     <p style={{ color: '#718096', fontSize: '1rem' }}>
-                        Enter password to continue
+                        Enter your authorized email to continue
                     </p>
                 </div>
 
@@ -69,13 +79,13 @@ const Login = ({ onLoginSuccess }) => {
                             color: '#2d3748',
                             fontSize: '0.95rem'
                         }}>
-                            Password
+                            Email Address
                         </label>
                         <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Enter password"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="your.email@example.com"
                             disabled={loading}
                             required
                             style={{
@@ -115,29 +125,29 @@ const Login = ({ onLoginSuccess }) => {
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        disabled={loading || !password}
+                        disabled={loading || !email}
                         style={{
                             width: '100%',
                             padding: '1rem',
                             borderRadius: '8px',
                             border: 'none',
-                            background: loading || !password ? '#cbd5e0' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            background: loading || !email ? '#cbd5e0' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                             color: 'white',
                             fontSize: '1.05rem',
                             fontWeight: 600,
-                            cursor: loading || !password ? 'not-allowed' : 'pointer',
+                            cursor: loading || !email ? 'not-allowed' : 'pointer',
                             transition: 'transform 0.2s, box-shadow 0.2s',
-                            boxShadow: loading || !password ? 'none' : '0 4px 12px rgba(102, 126, 234, 0.4)'
+                            boxShadow: loading || !email ? 'none' : '0 4px 12px rgba(102, 126, 234, 0.4)'
                         }}
                         onMouseOver={(e) => {
-                            if (!loading && password) {
+                            if (!loading && email) {
                                 e.target.style.transform = 'translateY(-2px)';
                                 e.target.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
                             }
                         }}
                         onMouseOut={(e) => {
                             e.target.style.transform = 'translateY(0)';
-                            e.target.style.boxShadow = loading || !password ? 'none' : '0 4px 12px rgba(102, 126, 234, 0.4)';
+                            e.target.style.boxShadow = loading || !email ? 'none' : '0 4px 12px rgba(102, 126, 234, 0.4)';
                         }}
                     >
                         {loading ? 'Verifying...' : 'Access App'}

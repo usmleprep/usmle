@@ -6,6 +6,7 @@ import TestInterface from './components/TestInterface';
 import TestHistory from './components/TestHistory';
 import TestReview from './components/TestReview';
 import Login from './components/Login';
+import { isEmailAuthorized } from './config/authorizedEmails';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -14,7 +15,19 @@ function App() {
   useEffect(() => {
     // Check for existing session in localStorage
     const authenticated = localStorage.getItem('usmle_authenticated') === 'true';
-    setIsAuthenticated(authenticated);
+    const storedEmail = localStorage.getItem('usmle_user_email');
+
+    // Validate that the stored email is still authorized
+    if (authenticated && storedEmail && isEmailAuthorized(storedEmail)) {
+      setIsAuthenticated(true);
+    } else {
+      // Clear invalid session
+      localStorage.removeItem('usmle_authenticated');
+      localStorage.removeItem('usmle_user_email');
+      localStorage.removeItem('usmle_session_time');
+      setIsAuthenticated(false);
+    }
+
     setCheckingAuth(false);
   }, []);
 

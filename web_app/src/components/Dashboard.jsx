@@ -86,9 +86,52 @@ const Dashboard = () => {
         ? Math.round((stats.questionsDone / stats.totalQuestions) * 100)
         : 0;
 
+    const userEmail = localStorage.getItem('usmle_user_email') || '';
+
+    const handleLogout = () => {
+        const confirmed = window.confirm('Are you sure you want to logout?');
+        if (confirmed) {
+            localStorage.removeItem('usmle_authenticated');
+            localStorage.removeItem('usmle_user_email');
+            localStorage.removeItem('usmle_session_time');
+            window.location.reload();
+        }
+    };
+
     return (
         <div className="dashboard">
-            <header style={{ marginBottom: '3rem', textAlign: 'center' }}>
+            <header style={{ marginBottom: '3rem', textAlign: 'center', position: 'relative' }}>
+                {/* Logout button - top right */}
+                <div style={{ position: 'absolute', top: 0, right: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
+                    <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                        {userEmail}
+                    </div>
+                    <button
+                        onClick={handleLogout}
+                        style={{
+                            padding: '0.5rem 1rem',
+                            borderRadius: '6px',
+                            border: '1px solid var(--border-color)',
+                            background: 'white',
+                            color: 'var(--text-secondary)',
+                            cursor: 'pointer',
+                            fontSize: '0.875rem',
+                            fontWeight: 600,
+                            transition: 'all 0.2s'
+                        }}
+                        onMouseOver={(e) => {
+                            e.currentTarget.style.borderColor = '#ef4444';
+                            e.currentTarget.style.color = '#ef4444';
+                        }}
+                        onMouseOut={(e) => {
+                            e.currentTarget.style.borderColor = 'var(--border-color)';
+                            e.currentTarget.style.color = 'var(--text-secondary)';
+                        }}
+                    >
+                        🚪 Logout
+                    </button>
+                </div>
+
                 <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>USMLE Dashboard</h1>
                 <p style={{ color: 'var(--text-secondary)' }}>Track your progress and mastery.</p>
             </header>
