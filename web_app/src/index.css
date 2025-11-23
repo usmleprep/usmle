@@ -1,0 +1,109 @@
+:root {
+  /* Minimalist Palette */
+  --bg-primary: #f8f9fa;
+  --bg-card: #ffffff;
+  --text-primary: #2d3748;
+  --text-secondary: #718096;
+  --accent-color: #4a5568;
+  --success-color: #48bb78;
+  --border-color: #e2e8f0;
+
+  /* Typography */
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Utility Classes */
+.card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  margin-top: 0;
+}
+
+/* Explanation Formatting */
+.explanation-content {
+  line-height: 1.7;
+}
+
+.explanation-content p {
+  margin-bottom: 1rem;
+  line-height: 1.7;
+}
+
+.explanation-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Lists in explanations */
+.explanation-content ul,
+.explanation-content ol {
+  margin: 1rem 0;
+  padding-left: 2rem;
+  line-height: 1.8;
+}
+
+.explanation-content li {
+  margin-bottom: 0.5rem;
+}
+
+.explanation-content li:last-child {
+  margin-bottom: 0;
+}
+
+/* Nested lists */
+.explanation-content ul ul,
+.explanation-content ol ol,
+.explanation-content ul ol,
+.explanation-content ol ul {
+  margin: 0.5rem 0;
+}
+
+/* Strong tags (headings, choice labels) */
+.explanation-content strong {
+  display: block;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.explanation-content strong:first-child {
+  margin-top: 0;
+}
+
+/* Educational Objective section */
+.explanation-content p:has(strong:contains("Educational")) {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
