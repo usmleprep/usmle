@@ -73,7 +73,7 @@ function App() {
   }
 
   return (
-    <Router basename="/usmle">
+    <Router>
       <AuthGuard setIsAuthenticated={setIsAuthenticated}>
         <div className="App">
           <Routes>
